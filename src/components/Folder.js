@@ -1,35 +1,26 @@
 import React, { Component } from 'react';
+import { AlbumConsumer } from '../providers/AlbumProvider';
 //const Checkbox = require('rc-checkbox');
-
-const myfolders = [
-  { name: 'default', isSelected: false },
-  { name: 'dogs', isSelected: true },
-  { name: 'cats', isSelected: false },
-  { name: 'cars', isSelected: false },
-];
 
 class Folder extends Component {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      folders: myfolders,
-      new_folder: '',
-      error: null
-    };
-  }
+  state = {
+    folders: [],
+    new_folder: '',
+    error: null
+  };
 
-
-
-  handleSubmit = (event) => {
+  handleSubmit = (dispatch, event) => {
     event.preventDefault();
-    if (this.state.new_folder === '') return;
-    if (this.state.new_folder !== '' && this.state.folders.find(entry => entry['name'] === this.state.new_folder)) {
-      this.setState({ error: 'This folder already exists. Please use a unique name.' })
+    const { new_folder, folders } = this.state;
+    if (new_folder === '') return;
+    if (new_folder !== '' && folders.find(entry => entry['name'] === new_folder)) {
+      dispatch({ type: 'ERROR', payload: { error: 'This folder already exists. Please use a unique name.' } });
       return;
     }
-    this.setState({ folders: this.state.folders.concat([{ name: this.state.new_folder, isSelected: false }]) });
     this.setState({ new_folder: '' });
+    dispatch({ type: 'ADD_FOLDER', payload: { folders: folders, newFolder: [{ name: new_folder, isSelected: false }] } });
+
   }
 
   handleChange = (event) => {
@@ -37,7 +28,7 @@ class Folder extends Component {
     this.setState({ ...this.state, [name]: value, error: null });
   }
 
-  handleChecked = (event) => {
+  handleChecked = (dispatch, event) => {
     const { name, value } = event.target;
     const myBoolValue = value === 'on' ? true : false;
     const newState = this.state.folders.map(item => {
@@ -48,53 +39,66 @@ class Folder extends Component {
       }
       return item;
     })
-    this.setState({ folders: newState });
+
+    dispatch({ type: 'UPDATE_FOLDERS', payload: { folders: newState } });
+
 
   }
 
   render() {
-    const { folders, new_folder, error } = this.state;
+
     return (
-      <React.Fragment>
-        <h1>
-          <span className="text-danger">Folder</span> List
-        </h1>
-        <form>
-          {folders.map(folder => (
-            (
-              <div className="card card-body mb-4">
-                <h4>
-                  <label>
-                    {folder.name + " "}
+      <AlbumConsumer>
+        {value => {
+          const { dispatch, folders, error } = value;
+          const new_folder = this.state.new_folder;
+          this.state.folders = folders;
+          return (
+            <React.Fragment>
+              <h1>
+                <span className="text-danger">Albums</span> Available
+              </h1>
+              <form>
+                {folders.map(myfolder => (
+                  (
+                    <div className="card card-body mb-4">
+                      <h4>
+                        <label>
+                          {myfolder.name + " "}
+                          <input
+                            name={myfolder.name}
+                            type="checkbox"
+                            checked={myfolder.isSelected}
+                            onChange={this.handleChecked.bind(this, dispatch)}
+                          />
+                        </label>
+                      </h4>
+                    </div>
+                  )))}
+              </form>
+              <div className="card mb-3">
+                <div className="card-header">Add New Folder</div>
+                <div className="card-body">
+                  <form onSubmit={this.handleSubmit.bind(this, dispatch)}>
                     <input
-                      name={folder.name}
-                      type="checkbox"
-                      checked={folder.isSelected}
-                      onChange={this.handleChecked}
+                      label="Folder Name"
+                      name="new_folder"
+                      type="text"
+                      placeholder="Enter New Folder Name"
+                      value={new_folder}
+                      onChange={this.handleChange}
                     />
-                  </label>
-                </h4>
+                    <input type="submit" value="Add Folder" className="btn btn-dark" />
+                    {error && <div className="alert alert-danger">{error}</div>}
+                  </form></div>
               </div>
-            )))}
-        </form>
-        <div className="card mb-3">
-          <div className="card-header">Add New Folder</div>
-          <div className="card-body">
-            <form onSubmit={this.handleSubmit}>
-              <input
-                label="Folder Name"
-                name="new_folder"
-                type="text"
-                placeholder="Enter New Folder Name"
-                value={new_folder}
-                onChange={this.handleChange}
-              />
-              <input type="submit" value="Add Folder" className="btn btn-dark" />
-              {error && <div className="alert alert-danger">{error}</div>}
-            </form></div>
-        </div>
-      </React.Fragment>
+            </React.Fragment>
+          )
+        }
+        }
+      </AlbumConsumer>
     )
+
   }
 }
 
