@@ -5,14 +5,13 @@ import { AlbumConsumer } from '../providers/AlbumProvider';
 class Folder extends Component {
 
   state = {
-    folders: [],
-    new_folder: '',
-    error: null
+    new_folder: ''
   };
 
-  handleSubmit = (dispatch, event) => {
+  handleSubmit = (dispatch, folders, event) => {
     event.preventDefault();
-    const { new_folder, folders } = this.state;
+    // const { new_folder, folders } = this.state;
+    const { new_folder } = this.state;
     if (new_folder === '') return;
     if (new_folder !== '' && folders.find(entry => entry['name'] === new_folder)) {
       dispatch({ type: 'ERROR', payload: { error: 'This folder already exists. Please use a unique name.' } });
@@ -28,10 +27,10 @@ class Folder extends Component {
     this.setState({ ...this.state, [name]: value, error: null });
   }
 
-  handleChecked = (dispatch, event) => {
+  handleChecked = (dispatch, folders, event) => {
     const { name, value } = event.target;
     const myBoolValue = value === 'on' ? true : false;
-    const newState = this.state.folders.map(item => {
+    const newState = folders.map(item => {
       if (item.name === name) {
         item.isSelected = myBoolValue;
       } else {
@@ -39,7 +38,7 @@ class Folder extends Component {
       }
       return item;
     })
-
+    this.setState({ 'new_folder': '' });
     dispatch({ type: 'UPDATE_FOLDERS', payload: { folders: newState } });
 
 
@@ -52,7 +51,7 @@ class Folder extends Component {
         {value => {
           const { dispatch, folders, error } = value;
           const new_folder = this.state.new_folder;
-          this.state.folders = folders;
+
           return (
             <React.Fragment>
               <h1>
@@ -69,7 +68,7 @@ class Folder extends Component {
                             name={myfolder.name}
                             type="checkbox"
                             checked={myfolder.isSelected}
-                            onChange={this.handleChecked.bind(this, dispatch)}
+                            onChange={this.handleChecked.bind(this, dispatch, folders)}
                           />
                         </label>
                       </h4>
@@ -79,7 +78,7 @@ class Folder extends Component {
               <div className="card mb-3">
                 <div className="card-header">Add New Folder</div>
                 <div className="card-body">
-                  <form onSubmit={this.handleSubmit.bind(this, dispatch)}>
+                  <form onSubmit={this.handleSubmit.bind(this, dispatch, folders)}>
                     <input
                       label="Folder Name"
                       name="new_folder"
