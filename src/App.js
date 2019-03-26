@@ -8,8 +8,6 @@ import Gallery from './components/Gallery';
 import NotFound from './components/pages/NotFound';
 
 
-
-
 function App() {
   const [count, setCount] = useState(0);
 
