@@ -29,17 +29,19 @@ class Folder extends Component {
 
   handleChecked = (dispatch, folders, event) => {
     const { name, value } = event.target;
-    const myBoolValue = value === 'on' ? true : false;
+    //const myBoolValue = value === 'on' ? true : false;
     const newState = folders.map(item => {
       if (item.name === name) {
-        item.isSelected = myBoolValue;
+        item.isSelected = true;
+        localStorage.setItem("selectedFolder", item.name);
+
       } else {
         item.isSelected = false;
       }
       return item;
     })
     this.setState({ 'new_folder': '' });
-    dispatch({ type: 'UPDATE_FOLDERS', payload: { folders: newState } });
+    dispatch({ type: 'UPDATE_FOLDERS', payload: { folders: newState, selectedFolder: name } });
 
 
   }

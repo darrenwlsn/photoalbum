@@ -10,20 +10,21 @@ const myfolders = [
 
 const AlbumContext = React.createContext();
 
+
 const reducer = (state, action) => {
+  if (action == null) return state;
   switch (action.type) {
     case 'ADD_FOLDER':
       return {
         ...state,
         folders: action.payload.folders.concat(action.payload.newFolder),
-        new_folder: ''
       }
     case 'UPDATE_FOLDERS':
       return {
         ...state,
         folders: action.payload.folders,
         error: null,
-        new_folder: ''
+        selectedFolder: action.payload.selectedFolder
       }
     case 'ERROR':
       return {
@@ -43,22 +44,37 @@ const reducer = (state, action) => {
 export const AlbumConsumer = AlbumContext.Consumer;
 
 class AlbumProvider extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      custom: 'hello',
+      folders: [],
+      error: null,
+      selectedFolder: 'default',
+      dispatch: action => this.setState(state => reducer(state, action))
+    };
+    if (localStorage.getItem("selectedFolder") == undefined) {
+      localStorage.setItem("selectedFOlder", "default");
+    }
 
-  state = {
-    folders: [],
-    new_folder: '',
-    error: null,
-    dispatch: action => this.setState(state => reducer(state, action))
-  };
+  }
 
 
   async componentDidMount() {
+
     const res = await axios
-      .get('http://localhost:3001/folders');
+      .get('http://localhost:3001/folders')
+      .catch((e) => {
+        alert('error' + e);
+      });
+    this.setState({ ...this.state, folders: res.data });
+
+
+
     // .get(`${process.env.REACT_APP_API_URL}/folders`);
 
 
-    this.setState({ folders: res.data });
+
 
   }
   // fetchTheFolders = async () => {
