@@ -62,21 +62,34 @@ class AlbumProvider extends Component {
 
   async componentDidMount() {
 
-    const res = await axios
-      .get('http://localhost:3001/folders')
-      .catch((e) => {
-        alert('error' + e);
-      });
-    this.setState({ ...this.state, folders: res.data });
-
-
-
-    // .get(`${process.env.REACT_APP_API_URL}/folders`);
-
-
-
-
+    // const res = await axios
+    //   .get('http://localhost:3001/folders')
+    //   .catch((e) => {
+    //     alert('error' + e);
+    //   });
+    const res = axios({
+      method: 'get',
+      url: 'http://localhost:3001/folders',
+      auth: {
+        username: 'darren',
+        password: 'yamahamt09'
+      },
+    }).then(response => {
+      this.setState({ ...this.state, folders: response.data });
+    }).catch(e => {
+      alert('error!! ' + e)
+    });
   }
+
+
+
+
+  // .get(`${process.env.REACT_APP_API_URL}/folders`);
+
+
+
+
+
   // fetchTheFolders = async () => {
   //   await axios.get('http://localhost:3001/folders')
   //     .then(res => {

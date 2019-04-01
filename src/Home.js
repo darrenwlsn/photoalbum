@@ -1,8 +1,39 @@
 import React, { Component } from 'react';
+import { withAuth } from '@okta/okta-react';
 import { Navbar, Nav, NavDropdown, Form, FormControl, Button } from 'react-bootstrap';
-import { AlbumConsumer } from '../../providers/AlbumProvider';
+import { AlbumConsumer } from './providers/AlbumProvider';
 
-class AppNavbar extends Component {
+export default withAuth(class Home extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { authenticated: null };
+    this.checkAuthentication = this.checkAuthentication.bind(this);
+    this.checkAuthentication();
+    this.login = this.login.bind(this);
+    this.logout = this.logout.bind(this);
+  }
+
+  async checkAuthentication() {
+    const authenticated = await this.props.auth.isAuthenticated();
+    if (authenticated !== this.state.authenticated) {
+      this.setState({ authenticated });
+    }
+  }
+
+  componentDidUpdate() {
+    this.checkAuthentication();
+  }
+
+  async login() {
+    // Redirect to '/' after login
+    this.props.auth.login('/');
+  }
+
+  async logout() {
+    // Redirect to '/' after logout
+    this.props.auth.logout('/');
+  }
+
 
   render() {
     return (
@@ -23,7 +54,6 @@ class AppNavbar extends Component {
                   <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="mr-auto">
                       <Nav.Link href="/">Home</Nav.Link>
-                      <Nav.Link href="#link">Link</Nav.Link>
                       <NavDropdown title="Actions" id="basic-nav-dropdown">
                         <NavDropdown.Item href="/folders">Select Folder</NavDropdown.Item>
                         <NavDropdown.Item href="/gallery">Browse</NavDropdown.Item>
@@ -35,9 +65,11 @@ class AppNavbar extends Component {
                       <FormControl type="text" placeholder="Search" className="mr-sm-2" />
                       <Button variant="outline-success">Search</Button>
                     </Form>
+                    {this.state.authenticated ? <Nav.Link href="#logout" onClick={this.logout}>Logout</Nav.Link> : <Nav.Link href="#login" onClick={this.login}>Login</Nav.Link>}
+
                   </Navbar.Collapse>
-                </Navbar>;
-    </div>
+                </Navbar>
+              </div>
 
             </React.Fragment>
           )
@@ -46,8 +78,4 @@ class AppNavbar extends Component {
       </AlbumConsumer>
     )
   }
-
-}
-
-
-export default AppNavbar;
+});
