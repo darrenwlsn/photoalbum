@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import { withAuth } from '@okta/okta-react';
+
+const apiUrl = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_PROD_API_URL : process.env.REACT_APP_DEV_API_URL;
 
 const myfolders = [
   { name: 'default', isSelected: false },
@@ -43,7 +46,7 @@ const reducer = (state, action) => {
 
 export const AlbumConsumer = AlbumContext.Consumer;
 
-class AlbumProvider extends Component {
+export default withAuth(class AlbumProvider extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -54,26 +57,29 @@ class AlbumProvider extends Component {
       dispatch: action => this.setState(state => reducer(state, action))
     };
     if (localStorage.getItem("selectedFolder") == undefined) {
-      localStorage.setItem("selectedFOlder", "default");
+      localStorage.setItem("selectedFolder", "default");
     }
 
   }
 
 
   async componentDidMount() {
-
+    if (JSON.parse(localStorage.getItem("okta-token-storage")).accessToken === undefined) return;
+    const token = JSON.parse(localStorage.getItem("okta-token-storage")).accessToken.accessToken;
     // const res = await axios
     //   .get('http://localhost:3001/folders')
     //   .catch((e) => {
     //     alert('error' + e);
     //   });
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token
+    };
     const res = axios({
       method: 'get',
-      url: 'http://localhost:3001/folders',
-      auth: {
-        username: 'darren',
-        password: 'yamahamt09'
-      },
+      url: `${apiUrl}/folders`,
+      //url: 'https://mighty-forest-31646.herokuapp.com/folders',
+      headers: headers
     }).then(response => {
       this.setState({ ...this.state, folders: response.data });
     }).catch(e => {
@@ -109,5 +115,6 @@ class AlbumProvider extends Component {
     )
   }
 }
+)
 
-export default AlbumProvider;
+//export default AlbumProvider;

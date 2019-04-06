@@ -7,6 +7,7 @@ import Gallery from './components/Gallery';
 import NotFound from './components/pages/NotFound';
 import { Security, SecureRoute, ImplicitCallback } from '@okta/okta-react';
 import Home from './Home';
+require('dotenv').config();
 
 const config = {
   issuer: 'https://dev-344587.okta.com/oauth2/default',
