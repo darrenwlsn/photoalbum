@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { withAuth } from '@okta/okta-react';
+import urlconfig from '../urlconfig';
 
 const apiUrl = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_PROD_API_URL : process.env.REACT_APP_DEV_API_URL;
 
@@ -56,7 +57,7 @@ export default withAuth(class AlbumProvider extends Component {
       selectedFolder: 'default',
       dispatch: action => this.setState(state => reducer(state, action))
     };
-    if (localStorage.getItem("selectedFolder") == undefined) {
+    if (localStorage.getItem("selectedFolder") === undefined) {
       localStorage.setItem("selectedFolder", "default");
     }
 
@@ -75,16 +76,18 @@ export default withAuth(class AlbumProvider extends Component {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + token
     };
-    const res = axios({
+
+    const res = await axios({
       method: 'get',
-      url: `${apiUrl}/folders`,
+      url: `${urlconfig.apiUrl}/folders`,
       //url: 'https://mighty-forest-31646.herokuapp.com/folders',
       headers: headers
-    }).then(response => {
-      this.setState({ ...this.state, folders: response.data });
     }).catch(e => {
-      alert('error!! ' + e)
+      alert('error!! ' + e);
+      return;
     });
+    this.setState({ ...this.state, folders: res.data });
+
   }
 
 
