@@ -47,14 +47,14 @@ const reducer = (state, action) => {
 
 export const AlbumConsumer = AlbumContext.Consumer;
 
-export default withAuth(class AlbumProvider extends Component {
+export default class AlbumProvider extends Component {
+  //export default withAuth(class AlbumProvider extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      custom: 'hello',
       folders: [],
       error: null,
-      selectedFolder: 'default',
+      selectedFolder: localStorage.getItem("selectedFolder") ? localStorage.getItem("selectedFolder") : 'default',
       dispatch: action => this.setState(state => reducer(state, action))
     };
     if (localStorage.getItem("selectedFolder") === undefined) {
@@ -65,8 +65,13 @@ export default withAuth(class AlbumProvider extends Component {
 
 
   async componentDidMount() {
-    if (JSON.parse(localStorage.getItem("okta-token-storage")).accessToken === undefined) return;
-    const token = JSON.parse(localStorage.getItem("okta-token-storage")).accessToken.accessToken;
+    const token = '';
+    try {
+      token = JSON.parse(localStorage.getItem("okta-token-storage")).accessToken.accessToken;
+    } catch (e) {
+      return;  // not yet authenticated
+    }
+
     // const res = await axios
     //   .get('http://localhost:3001/folders')
     //   .catch((e) => {
@@ -118,6 +123,6 @@ export default withAuth(class AlbumProvider extends Component {
     )
   }
 }
-)
+// )
 
 //export default AlbumProvider;

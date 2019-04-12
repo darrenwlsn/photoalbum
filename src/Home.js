@@ -78,4 +78,5 @@ export default withAuth(class Home extends Component {
       </AlbumConsumer>
     )
   }
-});
+}
+);

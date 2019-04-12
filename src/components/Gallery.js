@@ -39,8 +39,8 @@ class Gallery extends Component {
     return (
       <React.Fragment>
         {
-          contents.map(file => (
-            <img src={file.name} onClick={this.showImage.bind(this, file.name)} />
+          contents.map((file, index) => (
+            <img src={file.name} onClick={this.showImage.bind(this, file.name)} key={index} />
           ))
         }
       </React.Fragment>

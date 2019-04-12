@@ -51,7 +51,7 @@ class Folder extends Component {
     return (
       <AlbumConsumer>
         {value => {
-          const { dispatch, folders, error } = value;
+          const { dispatch, folders, selectedFolder, error } = value;
           const new_folder = this.state.new_folder;
 
           return (
@@ -60,16 +60,16 @@ class Folder extends Component {
                 <span className="text-danger">Albums</span> Available
               </h1>
               <form>
-                {folders.map(myfolder => (
+                {folders.map((myfolder, index) => (
                   (
-                    <div className="card card-body mb-4">
+                    <div className="card card-body mb-2" key={index}>
                       <h4>
                         <label>
                           {myfolder.name + " "}
                           <input
                             name={myfolder.name}
                             type="checkbox"
-                            checked={myfolder.isSelected}
+                            checked={myfolder.isSelected || myfolder.name === selectedFolder}
                             onChange={this.handleChecked.bind(this, dispatch, folders)}
                           />
                         </label>
