@@ -3,16 +3,8 @@ import axios from 'axios';
 import { withAuth } from '@okta/okta-react';
 import urlconfig from '../urlconfig';
 
-const apiUrl = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_PROD_API_URL : process.env.REACT_APP_DEV_API_URL;
-
-const myfolders = [
-  { name: 'default', isSelected: false },
-  { name: 'dogs', isSelected: true },
-  { name: 'cats', isSelected: false },
-  { name: 'cars', isSelected: false },
-];
-
 const AlbumContext = React.createContext();
+
 
 
 const reducer = (state, action) => {
@@ -65,53 +57,31 @@ export default class AlbumProvider extends Component {
 
 
   async componentDidMount() {
-    const token = '';
+    let token = '';
     try {
       token = JSON.parse(localStorage.getItem("okta-token-storage")).accessToken.accessToken;
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      };
+
+      const userBucket = localStorage.getItem("userkey");
+
+      const res = await axios({
+        method: 'get',
+        url: `${urlconfig.apiUrl}/folders/${userBucket}`,
+        //url: 'https://mighty-forest-31646.herokuapp.com/folders',
+        headers: headers
+      }).catch(e => {
+        alert('error!! ' + e);
+        return;
+      });
+      this.setState({ ...this.state, folders: res.data });
     } catch (e) {
       return;  // not yet authenticated
     }
 
-    // const res = await axios
-    //   .get('http://localhost:3001/folders')
-    //   .catch((e) => {
-    //     alert('error' + e);
-    //   });
-    const headers = {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + token
-    };
-
-    const res = await axios({
-      method: 'get',
-      url: `${urlconfig.apiUrl}/folders`,
-      //url: 'https://mighty-forest-31646.herokuapp.com/folders',
-      headers: headers
-    }).catch(e => {
-      alert('error!! ' + e);
-      return;
-    });
-    this.setState({ ...this.state, folders: res.data });
-
   }
-
-
-
-
-  // .get(`${process.env.REACT_APP_API_URL}/folders`);
-
-
-
-
-
-  // fetchTheFolders = async () => {
-  //   await axios.get('http://localhost:3001/folders')
-  //     .then(res => {
-  //       const thefolderlist = res.data;
-
-  //       this.setState({ folders: thefolderlist });
-  //     })
-  // }
 
 
 
@@ -123,6 +93,3 @@ export default class AlbumProvider extends Component {
     )
   }
 }
-// )
-
-//export default AlbumProvider;

@@ -4,6 +4,7 @@ import AlbumProvider from './providers/AlbumProvider';
 import Folder from './components/Folder';
 import Upload from './components/Upload';
 import Gallery from './components/Gallery';
+import Details from './components/Details';
 import NotFound from './components/pages/NotFound';
 import { Security, SecureRoute, ImplicitCallback } from '@okta/okta-react';
 import Home from './Home';
@@ -24,12 +25,7 @@ class App extends Component {
     return (
       <AlbumProvider>
         <React.Fragment>
-          <link
-            rel="stylesheet"
-            href="https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
-            integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
-            crossOrigin="anonymous"
-          />
+
           {/* <AppNavbar /> */}
 
           <div className="container">
@@ -48,6 +44,7 @@ class App extends Component {
                   <SecureRoute exact path="/folders" component={Folder} />
                   <SecureRoute exact path="/upload" component={Upload} />
                   <SecureRoute exact path="/gallery" component={Gallery} />
+                  <SecureRoute exact path="/details" component={Details} />
                   {/* <Route exact path="/login" component={LoginPage} /> */}
                   <Route component={NotFound} />
 

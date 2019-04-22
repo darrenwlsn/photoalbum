@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 import { AlbumConsumer } from '../providers/AlbumProvider';
+import urlconfig from '../urlconfig';
+
 //const Checkbox = require('rc-checkbox');
 
 class Folder extends Component {
@@ -19,6 +22,13 @@ class Folder extends Component {
     }
     this.setState({ new_folder: '' });
     dispatch({ type: 'ADD_FOLDER', payload: { folders: folders, newFolder: [{ name: new_folder, isSelected: false }] } });
+    var myFolders = folders.map(folder => {
+      return folder.name
+    });
+    if (!myFolders) myFolders = [];
+    myFolders.push(new_folder);
+    this.updateFolderList(myFolders);
+
 
   }
 
@@ -45,6 +55,39 @@ class Folder extends Component {
 
 
   }
+
+  updateFolderList = async (folders) => {
+    let token = '';
+    try {
+      token = JSON.parse(localStorage.getItem("okta-token-storage")).accessToken.accessToken;
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      };
+
+      const userBucket = localStorage.getItem("userkey");
+
+      const mydata = {
+        userBucket: userBucket,
+        folderList: folders
+      }
+
+      const res = await axios({
+        method: 'put',
+        url: `${urlconfig.apiUrl}/folders`,
+        //url: 'https://mighty-forest-31646.herokuapp.com/folders',
+        headers: headers,
+        data: mydata
+      }).catch(e => {
+        alert('error!! ' + e);
+        return;
+      });
+    } catch (e) {
+      return;
+    }
+
+  }
+
 
   render() {
 

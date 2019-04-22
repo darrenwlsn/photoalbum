@@ -6,7 +6,8 @@ class Gallery extends Component {
 
   state = { contents: [] };
   async componentDidMount() {
-    const mySelected = localStorage.getItem("selectedFolder");
+    const mySelected = localStorage.getItem("userkey") + '/' + localStorage.getItem("selectedFolder");
+
     const myurl = `${urlconfig.apiUrl}/thumbs/${mySelected}`;
 
     if (JSON.parse(localStorage.getItem("okta-token-storage")).accessToken === undefined) return;
@@ -34,13 +35,18 @@ class Gallery extends Component {
     window.open(imgUrl, "_self");
   }
 
+  showDetails = (fileName) => {
+    // re-route us to the details page
+    this.props.history.push(`/details?fileLocation=${fileName}`)
+  }
+
   render() {
     const contents = this.state.contents;
     return (
       <React.Fragment>
         {
           contents.map((file, index) => (
-            <img src={file.name} onClick={this.showImage.bind(this, file.name)} key={index} />
+            <img src={file.name} onClick={this.showDetails.bind(this, file.name)} key={index} />
           ))
         }
       </React.Fragment>

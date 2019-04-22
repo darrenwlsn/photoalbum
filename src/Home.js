@@ -15,9 +15,16 @@ export default withAuth(class Home extends Component {
 
   async checkAuthentication() {
     const authenticated = await this.props.auth.isAuthenticated();
+
     if (authenticated !== this.state.authenticated) {
       this.setState({ authenticated });
+      if (authenticated) {
+        let token = JSON.parse(localStorage.getItem("okta-token-storage")).accessToken.accessToken;
+        const userkey = await this.props.auth.getUser(token);
+        localStorage.setItem("userkey", userkey.sub);
+      }
     }
+
   }
 
   componentDidUpdate() {
@@ -39,11 +46,6 @@ export default withAuth(class Home extends Component {
     return (
       <AlbumConsumer>
         {value => {
-          const { selectedFolder } = value;
-          // var selectedFolder = folders.length > 0 ? folders[1].name : '';
-          // let selectedFolderArr = folders.filter(folder => folder.isSelected);
-          // if (selectedFolderArr.length > 0) selectedFolder = selectedFolderArr[0].name;
-
           return (
             <React.Fragment>
 
