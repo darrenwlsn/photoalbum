@@ -37,7 +37,9 @@ class Details extends Component {
         alert('error!! ' + e);
         return;
       });
-      this.setState({ ...this.state, title: res.data.title, caption: res.data.caption });
+      if (res.data) {
+        this.setState({ ...this.state, title: res.data.title, caption: res.data.caption });
+      }
     } catch (e) {
       return;  // not yet authenticated
     }
@@ -82,6 +84,11 @@ class Details extends Component {
     this.props.history.push(`/gallery`)
   };
 
+  handleDownload = (event) => {
+    const myFile = this.state.fileLoc.replace('thumb_', '');
+    window.open(myFile);
+  }
+
   render() {
     return (
       <React.Fragment>
@@ -103,6 +110,8 @@ class Details extends Component {
             </div>
 
             <button type="submit" class="btn btn-primary">Save</button>
+
+            <button class="btn btn-primary ml-2" onClick={this.handleDownload}>Download</button>
 
           </form>
         </div>
